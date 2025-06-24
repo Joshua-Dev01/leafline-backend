@@ -30,7 +30,7 @@ export const toggleLike = async (req: AuthenticatedRequest, res: Response) => {
       likesCount: blog.likes.length,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error liking blog" });
+    res.status(500).json({ message: "Server error liking the post" });
   }
 };
 
