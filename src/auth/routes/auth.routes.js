@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const login_routes_1 = __importDefault(require("../login/routes/login.routes"));
+const register_routes_1 = __importDefault(require("../register/routes/register.routes"));
+const profile_route_1 = __importDefault(require("../getProfile/routes/profile.route"));
+const updateProfile_routes_1 = __importDefault(require("../updateProfile/routes/updateProfile.routes"));
+const resetPassword_route_1 = __importDefault(require("../forgottenPassword/routes/resetPassword.route"));
+const deleteAccount_route_1 = __importDefault(require("../deleteAccount/routes/deleteAccount.route"));
+const authRouter = (0, express_1.Router)();
+authRouter.use(register_routes_1.default);
+authRouter.use(login_routes_1.default);
+authRouter.use(profile_route_1.default);
+authRouter.use(updateProfile_routes_1.default);
+authRouter.use(resetPassword_route_1.default);
+authRouter.use(deleteAccount_route_1.default);
+exports.default = authRouter;
