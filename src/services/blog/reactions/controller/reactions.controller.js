@@ -33,7 +33,7 @@ const toggleLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
     catch (error) {
-        res.status(500).json({ message: "Server error liking blog" });
+        res.status(500).json({ message: "Server error liking the post" });
     }
 });
 exports.toggleLike = toggleLike;
