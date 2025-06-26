@@ -8,8 +8,14 @@ import path from "path";
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const app = express();
 
+
+app.use(cors({
+  origin: process.env.CLIENT_URL, // e.g., http://localhost:3000
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 // Middlewares
-app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
