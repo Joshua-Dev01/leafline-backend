@@ -9,11 +9,18 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const app = express();
 
 
-app.use(cors({
-  origin: process.env.CLIENT_URL, // e.g., http://localhost:3000
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // Local dev
+      "https://leafline-frontend.vercel.app", // Replace with your deployed frontend
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    // credentials: true, // Optional: If you're using cookies or sessions
+  })
+);
+
 // Middlewares
 
 app.use(express.json());
