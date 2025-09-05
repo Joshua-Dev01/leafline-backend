@@ -13,7 +13,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000", // Local dev
-      "https://leafline-frontend.vercel.app", // Replace with your deployed frontend
+      "https://leaf-llne-frontend-design.vercel.app/", // Replace with your deployed frontend
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
