@@ -3,17 +3,18 @@ import cors from "cors";
 import dotenv from "dotenv";
 import router from "./routes/routes";
 import path from "path";
+// import createSubjectsRouter from "./services/Students/subjects/CreateSubjects/routes/CreateSubject.routes";
+import subjectsRouter from "./services/Students/subjects/routes/subjects.route";
 
 // Load env variables
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const app = express();
 
-
 app.use(
   cors({
     origin: [
       "http://localhost:3000", // Local dev
-      "https://leafline-frontend.vercel.app", // Replace with your deployed frontend
+      "https://leaf-llne-frontend-design.vercel.app/",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -31,5 +32,6 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/v1", router);
+app.use("/api/v1/subjects", subjectsRouter);
 
 export default app;
