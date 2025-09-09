@@ -12,13 +12,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000", // Local dev
-      "https://leaf-llne-frontend-design.vercel.app/",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "*", // Allow all origins
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    // credentials: true, // Optional: If you're using cookies or sessions
   })
 );
 
