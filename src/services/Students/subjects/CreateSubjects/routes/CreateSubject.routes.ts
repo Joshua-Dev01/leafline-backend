@@ -13,7 +13,7 @@ import {
 const subjectsRouter = express.Router();
 
 // All routes protected
-subjectsRouter.use( catchAsync (protect));
+subjectsRouter.use(catchAsync(protect));
 
 // CREATE
 subjectsRouter.post("/add-subjects", catchAsync(createSubject));

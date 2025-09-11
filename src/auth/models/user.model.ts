@@ -1,11 +1,14 @@
 import mongoose from "mongoose";
 
+export type UserRole = "user" | "admin";
+
 export interface IUser extends mongoose.Document {
+  id: mongoose.Types.ObjectId;
   _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
   password: string;
-  role: "user" | "admin";
+  role: UserRole;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
   createdAt?: Date;
