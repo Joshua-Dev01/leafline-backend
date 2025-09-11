@@ -7,22 +7,9 @@ import OpenAIrouter from "./services/OpenAI/routes/openAi.route";
 
 const app = express();
 
-// Parse allowed origins from .env
-const allowedOrigins = process.env.CLIENT_URL?.split(",") || [];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) {
-        // Allow non-browser clients (like Postman, curl)
-        return callback(null, true);
-      }
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
