@@ -19,7 +19,7 @@ export const replyToComment = async (
   if (!comment) return res.status(404).json({ message: "Comment not found" });
 
   comment.replies.push({
-    user: req.user._id,
+    user: req.user.id,
     text,
   });
 
