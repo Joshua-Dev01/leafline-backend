@@ -12,7 +12,7 @@ export const deleteComment = async (req: AuthenticatedRequest, res: Response) =>
   const comment = blog.comments.id(commentId);
   if (!comment) return res.status(404).json({ message: "Comment not found" });
 
-  const isOwner = comment.user.toString() === req.user._id.toString();
+  const isOwner = comment.user.toString() === req.user.id.toString();
   const isAdmin = req.user.role === "admin";
 
   if (!isOwner && !isAdmin) {

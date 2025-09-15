@@ -1,15 +1,19 @@
 import { Request, Response } from "express";
 import { Blog } from "../../createBlog/models/blog.model";
-import { AuthenticatedRequest } from "../types/reactions";
 import { Types } from "mongoose";
 
-// ✅ Toggle Like
-export const toggleLike = async (req: AuthenticatedRequest, res: Response) => {
+// Toggle like 
+
+export const toggleLike = async (req: Request, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
     const blog = await Blog.findById(req.params.id);
     if (!blog) return res.status(404).json({ message: "Blog not found" });
 
-    const userId = new Types.ObjectId(req.user._id);
+    const userId = new Types.ObjectId(req.user.id);
 
     const alreadyLiked = blog.likes.some(
       (id) => id.toString() === userId.toString()
@@ -35,8 +39,12 @@ export const toggleLike = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 // ✅ Add Comment
-export const addComment = async (req: AuthenticatedRequest, res: Response) => {
+export const addComment = async (req: Request, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
     const { text } = req.body;
     if (!text)
       return res.status(400).json({ message: "Comment text is required" });
@@ -45,7 +53,7 @@ export const addComment = async (req: AuthenticatedRequest, res: Response) => {
     if (!blog) return res.status(404).json({ message: "Blog not found" });
 
     blog.comments.push({
-      user: req.user._id,
+      user: req.user.id,
       text,
     });
 
