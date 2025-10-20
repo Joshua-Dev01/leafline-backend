@@ -1,12 +1,18 @@
 import { Request, Response } from "express";
 import { Subject } from "../models/subject.model";
-import { subjectUpdateValidation, subjectValidation } from "../validations/subject.validations";
+import {
+  subjectUpdateValidation,
+  subjectValidation,
+} from "../validations/subject.validations";
+import { Notification } from "../../../../Notifications/models/notification.model";
+import { createNotification } from "../../../../Notifications/services/notification.service";
 
 // Create a new Subject
 export const createSubject = async (req: Request, res: Response) => {
   try {
     const { error } = subjectValidation.validate(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
+    if (error)
+      return res.status(400).json({ message: error.details[0].message });
 
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Unauthorized: User not found" });
@@ -14,6 +20,15 @@ export const createSubject = async (req: Request, res: Response) => {
 
     const subject = new Subject({ ...req.body, userId: req.user.id });
     await subject.save();
+
+    // Create a notification for the new subject
+    await createNotification({
+      userId: req.user.id,
+      title: "New Subject Created",
+      message: `You added a new subject: ${req.body.name}`,
+    });
+    console.log("Notification created ✅");
+
     res.status(201).json(subject);
   } catch (err) {
     res.status(500).json({ message: "Failed to create subject", error: err });
@@ -48,7 +63,8 @@ export const getSubjectById = async (req: Request, res: Response) => {
 export const updateSubject = async (req: Request, res: Response) => {
   try {
     const { error } = subjectUpdateValidation.validate(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
+    if (error)
+      return res.status(400).json({ message: error.details[0].message });
 
     const subject = await Subject.findById(req.params.id);
     if (!subject) return res.status(404).json({ message: "Subject not found" });

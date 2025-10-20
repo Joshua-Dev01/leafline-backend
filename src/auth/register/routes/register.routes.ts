@@ -6,4 +6,5 @@ const registerRouter = express.Router();
 
 registerRouter.post("/register", catchAsync(register));
 
+
 export default registerRouter;

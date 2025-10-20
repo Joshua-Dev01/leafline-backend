@@ -28,6 +28,6 @@ subjectsRouter.put("/:id", catchAsync(updateSubject));
 // DELETE
 subjectsRouter.delete("/:id", catchAsync(deleteSubject));
 
-console.log("✅ SubjectsRouter loaded");
+
 
 export default subjectsRouter;
