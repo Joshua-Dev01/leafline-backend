@@ -10,7 +10,7 @@ export interface IUser extends Document {
   role: UserRole;
   phone?: string;
   picture?: string;
-  googleId?: string;           
+  googleId?: string;
   isGoogleAccount?: boolean;
   resetPasswordToken?: string;
   resetPasswordExpire?: Date;
@@ -22,7 +22,7 @@ const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true },
-    password: { type: String, required: true },
+    password: { type: String, required: function () { return !this.isGoogleAccount; } },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     phone: { type: String, default: null },
     picture: { type: mongoose.Schema.Types.ObjectId, ref: "Picture" },
