@@ -1,5 +1,5 @@
 import express from "express";
-import catchAsync from "../../../../auth/utils/catchAsync";
+import catchAsync from "../../../../utils/catchAsync";
 import { searchBlogs } from "../../searchBlog/controller/searchBlog.controller";
 
 const searchBlogRouter = express.Router();

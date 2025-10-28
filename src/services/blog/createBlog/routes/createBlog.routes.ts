@@ -1,8 +1,8 @@
 import express from "express";
-import { protect } from "../../../../auth/middleware/protect";
+import { protect } from "../../../../MainAuth/middleware/protect";
 import { checkAdmin } from "../../../admin/middleware/checkAdmin.middleware";
 import { createBlog } from "../controller/createBlog.controller";
-import catchAsync from "../../../../auth/utils/catchAsync";
+import catchAsync from "../../../../utils/catchAsync";
 
 const createBlogRouter = express.Router();
 

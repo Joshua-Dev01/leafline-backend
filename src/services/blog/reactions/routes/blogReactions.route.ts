@@ -1,7 +1,7 @@
 import express from "express";
-import catchAsync from "../../../../auth/utils/catchAsync";
+import catchAsync from "../../../../utils/catchAsync";
 import { addComment, toggleLike } from "../controller/reactions.controller";
-import { protect } from "../../../../auth/middleware/protect";
+import { protect } from "../../../../MainAuth/middleware/protect";
 import { replyToComment } from "../controller/replyComments.controller";
 import { deleteComment } from "../controller/deleteComment.controller";
 

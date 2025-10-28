@@ -1,15 +1,17 @@
-// src/types/express.d.ts
-
-import { UserRole } from "../auth/models/user.model";
+import mongoose from "mongoose";
 
 declare global {
   namespace Express {
     interface UserPayload {
       id: string;
-       _id: mongoose.Types.ObjectId;_id: string;
+      _id: mongoose.Types.ObjectId;
       name: string;
       email: string;
-      role: UserRole;
+      accountType: "Education" | "Business" | "Personal"; // ✅ replaces role
+      phone?: string;
+      picture?: string;
+      role: "user" | "admin" | "superadmin";
+      bio?: string;
     }
 
     interface Request {

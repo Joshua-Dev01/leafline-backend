@@ -1,7 +1,7 @@
 // src/modules/subjects/routes/Subject.routes.ts
 import express from "express";
-import catchAsync from "../../../../../auth/utils/catchAsync";
-import { protect } from "../../../../../auth/middleware/protect";
+import catchAsync from "../../../../../utils/catchAsync";
+import { protect } from "../../../../../MainAuth/middleware/protect";
 import {
   createSubject,
   getAllSubjects,
@@ -9,6 +9,7 @@ import {
   updateSubject,
   deleteSubject,
 } from "../controllers/CreateSubject.controller";
+import NotesRouter from "../../../Pdf/routes/note.routes";
 
 const subjectsRouter = express.Router();
 
@@ -27,6 +28,8 @@ subjectsRouter.put("/:id", catchAsync(updateSubject));
 
 // DELETE
 subjectsRouter.delete("/:id", catchAsync(deleteSubject));
+
+subjectsRouter.use("/notes", NotesRouter)
 
 
 

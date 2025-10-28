@@ -1,8 +1,8 @@
 // src/routes/chatRoutes.ts
 import express from "express";
-import { protect } from "../../../auth/middleware/protect";
+import { protect } from "../../../MainAuth/middleware/protect";
 import {  deleteOpenAiChatHistory, getHistory, sendMessage } from "../controller/chatController";
-import catchAsync from "../../../auth/utils/catchAsync";
+import catchAsync from "../../../utils/catchAsync";
 
 const OpenAIrouter = express.Router();
 

@@ -4,7 +4,6 @@ import {
   subjectUpdateValidation,
   subjectValidation,
 } from "../validations/subject.validations";
-import { Notification } from "../../../../Notifications/models/notification.model";
 import { createNotification } from "../../../../Notifications/services/notification.service";
 
 // Create a new Subject

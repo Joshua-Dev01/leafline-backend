@@ -1,14 +1,14 @@
 // src/routes/notification.routes.ts
 import express from "express";
 
-import { protect } from "../../../auth/middleware/protect";
+import { protect } from "../../../MainAuth/middleware/protect";
 import {
   deleteNotification,
   getUserNotifications,
   markAllAsRead,
   markAsRead,
 } from "../controller/notification.controller";
-import catchAsync from "../../../auth/utils/catchAsync";
+import catchAsync from "../../../utils/catchAsync";
 
 const NotificationsRouter = express.Router();
 
