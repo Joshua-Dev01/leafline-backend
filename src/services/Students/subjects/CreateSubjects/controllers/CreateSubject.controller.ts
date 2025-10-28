@@ -26,7 +26,7 @@ export const createSubject = async (req: Request, res: Response) => {
       title: "New Subject Created",
       message: `You added a new subject: ${req.body.name}`,
     });
-    console.log("Notification created ✅");
+    console.log("Notification created ");
 
     res.status(201).json(subject);
   } catch (err) {
