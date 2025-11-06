@@ -4,30 +4,25 @@ import { LeafLineUser } from "../signup/model/user.model";
 
 export const resetPassword = async (req: Request, res: Response) => {
   try {
-    const { email, code, newPassword } = req.body;
+    const { password } = req.body;
+    const { token } = req.params;
 
-    if (!email || !code || !newPassword) {
-      return res
-        .status(400)
-        .json({ message: "Email, code, and new password are required" });
+    if (!token) {
+      return res.status(400).json({ message: "Invalid or missing token" });
     }
 
-    const user = await LeafLineUser.findOne({ email });
+    // Find user by reset token
+    const user = await LeafLineUser.findOne({
+      resetPasswordCode: token,
+      resetPasswordExpires: { $gt: new Date() }, // token not expired
+    });
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if code matches and not expired
-    if (
-      user.resetPasswordCode !== code ||
-      !user.resetPasswordExpires ||
-      user.resetPasswordExpires < new Date()
-    ) {
-      return res.status(400).json({ message: "Invalid or expired reset code" });
+      return res.status(400).json({ message: "Invalid or expired reset link" });
     }
 
     // Hash and update new password
-    const hashed = await bcrypt.hash(newPassword, 10);
+    const hashed = await bcrypt.hash(password, 10);
     user.password = hashed;
     user.resetPasswordCode = undefined;
     user.resetPasswordExpires = undefined;

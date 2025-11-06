@@ -16,6 +16,7 @@ export interface IUser extends Document {
   updatedAt?: Date;
   picture?: string;
   role: UserRole;
+  bio: string;
   resetPasswordCode?: string;
   resetPasswordExpires?: Date;
 }
@@ -25,6 +26,7 @@ const userSchema = new Schema<IUser>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    bio: { type: String},
     accountType: {
       type: String,
       enum: ["Education", "Business", "Personal"],

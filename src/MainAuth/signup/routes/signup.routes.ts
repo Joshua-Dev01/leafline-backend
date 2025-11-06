@@ -20,7 +20,7 @@ signupRouter.post("/verify-email", catchAsync(verifyEmail));
 signupRouter.post("/resend-email", catchAsync(resendVerificationEmail));
 signupRouter.post("/login", catchAsync(login));
 signupRouter.post("/forgot-password", catchAsync(forgotPassword));
-signupRouter.post("/reset-password", catchAsync(resetPassword));
+signupRouter.post("/reset-password/:token", catchAsync(resetPassword));
 signupRouter.post(
   "/change-password",
   catchAsync(protect),
@@ -37,7 +37,7 @@ signupRouter.delete(
   catchAsync(protect),
   catchAsync(deleteAccount)
 );
-signupRouter.post("/googleAuth", catchAsync(protect), catchAsync(googleAuth));
+signupRouter.post("/googleAuth",  catchAsync(googleAuth));
 // mainAuthRouter.post("/google-signup", catchAsync(googleSignup));
 // mainAuthRouter.post("/verify-email", catchAsync(verifyEmailCode));
 // mainAuthRouter.post("/resend-code", catchAsync(resendVerificationCode));

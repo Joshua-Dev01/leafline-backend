@@ -17,6 +17,7 @@ declare global {
         isVerified: boolean;
         picture: string;
         role: UserRole;
+        bio: string;
       };
     }
   }
@@ -76,6 +77,7 @@ export const protect = async (
       accountType: user.accountType,
       picture: user.picture || "",
       role: user.role,
+      bio: user.bio,
     };
 
     next();

@@ -1,27 +1,24 @@
 import express from "express";
-import {
-  deleteUserPicture,
-  getUserPicture,
-  uploadPicture,
-} from "../uploadPicture.controller";
+
 import { protect } from "../../middleware/protect";
 import { upload } from "../../middleware/upload";
 import catchAsync from "../../../utils/catchAsync";
+import { deleteProfilePicture, getProfilePicture, uploadProfilePicture } from "../dp.controller";
 
 const PicturesRouter = express.Router();
 
-PicturesRouter.put(
-  "/upload-picture",
+PicturesRouter.post(
+  "/upload-dp",
   catchAsync(protect),
-  upload.single("picture"),
-  catchAsync(uploadPicture)
+  upload.single("image"),
+  catchAsync(uploadProfilePicture)
 );
 
-PicturesRouter.get("/", catchAsync(protect), catchAsync(getUserPicture));
+PicturesRouter.get("/dp", catchAsync(protect), catchAsync(getProfilePicture));
 PicturesRouter.delete(
-  "/delete-picture",
+  "/delete-dp",
   catchAsync(protect),
-  catchAsync(deleteUserPicture)
+  catchAsync(deleteProfilePicture)
 );
 
 export default PicturesRouter;

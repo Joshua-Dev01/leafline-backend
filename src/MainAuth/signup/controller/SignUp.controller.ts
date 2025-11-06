@@ -6,7 +6,7 @@ import { sendVerificationEmail } from "../../../utils/sendVerificationEmail";
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, accountType } = req.body;
+    const { name, email, password, accountType, bio } = req.body;
 
     if (!name || !email || !password || !accountType) {
       return res.status(400).json({ message: "All fields are required" });
@@ -30,6 +30,7 @@ export const signup = async (req: Request, res: Response) => {
       accountType,
       verificationCode,
       verificationExpires,
+      bio,
     });
 
     // ✅ Email HTML with image, title, and styled code box

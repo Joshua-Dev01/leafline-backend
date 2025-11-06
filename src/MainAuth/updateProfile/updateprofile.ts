@@ -8,7 +8,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized — user not found in request" });
     }
 
-    const { name, accountType } = req.body;
+    const { name, accountType, bio } = req.body;
 
     const user = await LeafLineUser.findById(req.user.id);
     if (!user) {
@@ -17,6 +17,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
     if (name) user.name = name;
     if (accountType) user.accountType = accountType;
+    if (bio) user.bio = bio;
 
     await user.save();
 
@@ -27,6 +28,7 @@ export const updateProfile = async (req: Request, res: Response) => {
         name: user.name,
         email: user.email,
         accountType: user.accountType,
+        bio: user.bio,
       },
     });
   } catch (error) {
