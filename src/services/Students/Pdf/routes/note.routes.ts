@@ -10,7 +10,7 @@ const NotesRouter = express.Router();
 const upload = multer({ dest: "uploads/notes/" }); // or Cloudinary later
 
 NotesRouter.post("/:subjectId", catchAsync(protect), upload.single("file"), catchAsync(createNote));
-NotesRouter.get("/:subjectId", catchAsync(protect), getNotesBySubject);
+NotesRouter.get("/:subjectId", catchAsync(protect), catchAsync(getNotesBySubject));
 NotesRouter.get("/single/:id", catchAsync(protect), catchAsync(getNoteById));
 NotesRouter.put("/:id", catchAsync(protect), upload.single("file"), catchAsync(updateNote));
 NotesRouter.delete("/:id", catchAsync(protect), catchAsync(deleteNote));
