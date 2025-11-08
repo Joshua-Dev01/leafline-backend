@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 const DEFAULT_CLIENT_URLS =
   process.env.NODE_ENV === "production"
     ? ["leaf-llne-frontend-design.vercel.app"] // your production frontend
-    : ["localhost:3000"]; // local dev frontend
+    : ["localhost:3000"]; // local dev frontends
 
 // Allow overrides via .env (comma-separated)
 const CLIENT_URLS = process.env.CLIENT_URLS
