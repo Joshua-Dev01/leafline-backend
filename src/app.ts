@@ -10,30 +10,26 @@ import AdminRouter from "./admin/routes/admin.route";
 
 const app = express();
 
-// ✅ Secure, dynamic CORS setup for JWT-based API
-const corsOptions = {
-  origin: (origin: string | undefined, callback: any) => {
-    // Allow requests with no origin (Postman, curl, mobile apps)
-    if (!origin) return callback(null, true);
+//  Secure, dynamic CORS setup
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
 
-    // Allow localhost (dev) and production frontend
-    if (env.CLIENT_URLS.includes(origin)) return callback(null, true);
+      if (env.CLIENT_URLS.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.options("*", cors());
 
-    console.log("Blocked by CORS:", origin);
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: false, // ❌ JWT in headers does NOT need credentials
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-
-// ✅ Apply CORS globally
-app.use(cors(corsOptions));
-
-// ✅ Handle preflight requests
-app.options("*", cors(corsOptions));
-
-// ✅ Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -42,9 +38,10 @@ app.get("/", (_req, res) => {
   res.send("🌿 LeafLine API is running...");
 });
 
-// ✅ Main routes
+//Main routes
 app.use("/api/v1", Authrouter);
 app.use("/api/v1/auth/admin", AdminRouter);
+// app.use("/api/v1/auth", googleAuthRouter);
 app.use("/api/v1/subjects", subjectsRouter);
 app.use("/api/v1/chatAi", OpenAIrouter);
 app.use("/api/v1/notifications", NotificationsRouter);
