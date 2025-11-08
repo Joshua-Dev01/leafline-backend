@@ -4,7 +4,6 @@ import subjectsRouter from "./services/Students/subjects/routes/subjects.route";
 import OpenAIrouter from "./services/OpenAI/routes/openAi.route";
 import NotificationsRouter from "./services/Notifications/routes/notification.routes";
 import PicturesRouter from "./MainAuth/pictures/routes/pictures.routes";
-import googleAuthRouter from "./MainAuth/googleAuth/routes/googleAuth.routes";
 import { env } from "./config/env";
 import Authrouter from "./MainAuth/routes/auth.routes";
 import AdminRouter from "./admin/routes/admin.route";
@@ -31,7 +30,6 @@ app.use(
 );
 
 
-app.options("*", cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -44,7 +42,6 @@ app.get("/", (_req, res) => {
 // ✅ Main routes
 app.use("/api/v1", Authrouter);
 app.use("/api/v1/auth/admin", AdminRouter);
-app.use("/api/v1/auth", googleAuthRouter);
 app.use("/api/v1/subjects", subjectsRouter);
 app.use("/api/v1/chatAi", OpenAIrouter);
 app.use("/api/v1/notifications", NotificationsRouter);

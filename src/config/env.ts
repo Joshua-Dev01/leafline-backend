@@ -7,8 +7,8 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 // 🌍 Auto-detect environment and set default client URLs
 const DEFAULT_CLIENT_URLS =
   process.env.NODE_ENV === "production"
-    ? ["leaf-llne-frontend-design.vercel.app"] // your production frontend
-    : ["localhost:3000"]; // local dev frontends
+    ? ["https://leaf-llne-frontend-design.vercel.app"] // ✅ include https://
+    : ["http://localhost:3000"]; // ✅ include http://
 
 // Allow overrides via .env (comma-separated)
 const CLIENT_URLS = process.env.CLIENT_URLS
@@ -18,7 +18,7 @@ const CLIENT_URLS = process.env.CLIENT_URLS
 export const env = {
   PORT: process.env.PORT || "5000",
   NODE_ENV: process.env.NODE_ENV || "development",
-  CLIENT_URLS, // ✅ Array of client URLs
+  CLIENT_URLS, // ✅ Array of full client URLs
 
   MONGO_URI: process.env.MONGO_URI as string,
   JWT_SECRET: process.env.JWT_SECRET as string,
