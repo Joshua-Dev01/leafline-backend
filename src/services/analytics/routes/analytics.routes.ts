@@ -1,9 +1,12 @@
-// // routes/analytics.route.ts
-// import express from "express";
-// import { getMonthlyBlogStats } from "../controller/analytics.controller";
+import { Router } from "express";
+import { protect } from "../../../MainAuth/middleware/protect";
+import catchAsync from "../../../utils/catchAsync";
+import { getEventEngagementAnalytics } from "../controller/eventAlytics.controller";
 
-// const AnalyticsRouter = express.Router();
 
-// AnalyticsRouter.get("/monthly", getMonthlyBlogStats); // GET /api/analytics/monthly
+const Analyticsrouter = Router();
 
-// export default AnalyticsRouter;
+
+Analyticsrouter.get("/event-analytics", catchAsync(protect), catchAsync(getEventEngagementAnalytics));
+
+export default Analyticsrouter;

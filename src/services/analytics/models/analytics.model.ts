@@ -1,19 +1,25 @@
-import mongoose from "mongoose";
+// // src/services/Events/model/events.model.ts
+// import { Schema, model, Document } from "mongoose";
 
-const analyticsSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      unique: true,
-    },
-    booksRead: { type: Number, default: 0 },
-    readingHours: { type: Number, default: 0 },
-    booksDownloaded: { type: Number, default: 0 },
-    audiobooks: { type: Number, default: 0 },
-  },
-  { timestamps: true }
-);
+// export interface IEvent extends Document {
+//   title: string;
+//   interestedUsers: string[];
+//   goingUsers: string[];
+//   startDate: Date;
+//   endDate: Date;
+//   createdAt: Date;
+//   updatedAt: Date;
+// }
 
-export const Analytics = mongoose.model("Analytics", analyticsSchema);
+// const EventSchema = new Schema<IEvent>(
+//   {
+//     title: { type: String, required: true },
+//     interestedUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+//     goingUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+//     startDate: { type: Date, required: true },
+//     endDate: { type: Date, required: true },
+//   },
+//   { timestamps: true }
+// );
+
+// export const Event = model<IEvent>("Event", EventSchema);
