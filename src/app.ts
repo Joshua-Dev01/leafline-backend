@@ -9,9 +9,9 @@ import { env } from "./config/env";
 import Authrouter from "./MainAuth/routes/auth.routes";
 import AdminRouter from "./admin/routes/admin.route";
 import EventRouter from "./services/Events/routes/event.route";
-import { scheduleEventReminders } from "./services/Events/controller/event.controller";
 import Analyticsrouter from "./services/analytics/routes/analytics.routes";
 import projectRouter from "./services/project/routes/projects.routes";
+import { scheduleEventReminders } from "./services/Events/controller/eventReminder.cron";
 
 
 

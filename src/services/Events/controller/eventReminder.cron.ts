@@ -1,36 +1,49 @@
-import mongoose from "mongoose";
-import { Event, IEvent } from "../model/events.model";
+import cron from "node-cron";
 import { Notification } from "../../Notifications/models/notification.model";
+import { Event } from "../model/events.model";
 
-export const sendEventReminder = async (eventId: string): Promise<void> => {
+/**
+ * Runs every hour.
+ * Sends a reminder notification to all interested + going users
+ * for events starting within the next 24 hours.
+ */
+export const scheduleEventReminders = () => {
+  cron.schedule("0 * * * *", async () => {
     try {
-        const event: IEvent | null = await Event.findById(eventId);
-        if (!event) return;
+      const now         = new Date();
+      const in24Hours   = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-        // Merge interestedUsers and goingUsers, remove duplicates
-        const receivers = Array.from(
-            new Set([
-                ...event.interestedUsers.map((id) => id.toString()),
-                ...event.goingUsers.map((id) => id.toString()),
-            ])
-        );
+      const events = await Event.find({
+        startTime:    { $gte: now, $lte: in24Hours },
+        reminderSent: false,
+      });
 
-        if (receivers.length > 0) {
-            await Notification.insertMany(
-                receivers.map((userId) => ({
-                    userId: new mongoose.Types.ObjectId(userId),
-                    title: "Event Reminder",
-                    message: `Reminder: '${event.title}' is happening in less than 24 hours!`,
-                    type: "event",
-                }))
-            );
+      for (const event of events) {
+        // Merge interested + going, remove duplicates
+        const receiverSet = new Set([
+          ...event.interestedUsers.map((id) => id.toString()),
+          ...event.goingUsers.map((id)      => id.toString()),
+        ]);
+
+        if (receiverSet.size > 0) {
+          await Notification.insertMany(
+            [...receiverSet].map((userId) => ({
+              userId,
+              title:   "Event Reminder 🔔",
+              message: `"${event.title}" starts in less than 24 hours!`,
+              type:    "event",
+              meta:    { eventId: event._id },
+            }))
+          );
         }
 
         event.reminderSent = true;
         await event.save();
+      }
 
-        console.log(`✅ 24h reminder sent for event: ${event.title}`);
+      console.log(`✅ Event reminders sent for ${events.length} event(s)`);
     } catch (err) {
-        console.error("Error sending event reminder:", err);
+      console.error("❌ Reminder cron error:", err);
     }
+  });
 };

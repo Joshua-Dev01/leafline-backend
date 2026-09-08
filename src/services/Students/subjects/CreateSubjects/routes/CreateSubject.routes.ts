@@ -16,6 +16,13 @@ const subjectsRouter = express.Router();
 // All routes protected
 subjectsRouter.use(catchAsync(protect));
 
+// The /notes sub-router must be mounted BEFORE the generic /:id routes below.
+// Otherwise a request to /subjects/notes matches /subjects/:id first (with
+// id="notes") and the notes router is never reached — this was confirmed by
+// actually running the app: GET /subjects/notes returned "Subject not found"
+// from getSubjectById instead of the notes list.
+subjectsRouter.use("/notes", NotesRouter);
+
 // CREATE
 subjectsRouter.post("/add-subjects", catchAsync(createSubject));
 
@@ -28,8 +35,6 @@ subjectsRouter.put("/:id", catchAsync(updateSubject));
 
 // DELETE
 subjectsRouter.delete("/:id", catchAsync(deleteSubject));
-
-subjectsRouter.use("/notes", NotesRouter)
 
 
 

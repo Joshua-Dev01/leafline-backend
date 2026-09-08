@@ -1,6 +1,7 @@
 // src/services/Notes/controllers/note.controller.ts
 import { Request, Response } from "express";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 import { Subject } from "../../subjects/CreateSubjects/models/subject.model";
 import { createNotification } from "../../../Notifications/services/notification.service";
 import { Note } from "../model/note.model";
@@ -27,11 +28,30 @@ const deriveFileType = (resource_type?: string, mimeType?: string) => {
   return resource_type || "file";
 };
 
+/**
+ * FormData can't carry real arrays — the frontend sends tags as a
+ * JSON-stringified array (or a plain comma-separated string as a fallback).
+ */
+const parseTags = (raw: unknown): string[] => {
+  if (Array.isArray(raw)) return raw.map(String).map((t) => t.trim()).filter(Boolean);
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.map(String).map((t) => t.trim()).filter(Boolean);
+  } catch {
+    // not JSON — fall back to comma-separated
+  }
+  return raw
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+};
+
 // Create new note under a subject
 export const createNote = async (req: Request, res: Response) => {
   try {
     const { subjectId } = req.params;
-    const { title, description } = req.body;
+    const { title, description, content } = req.body;
 
     if (!req.user?.id)
       return res.status(401).json({ message: "Unauthorized: User not found" });
@@ -42,6 +62,9 @@ export const createNote = async (req: Request, res: Response) => {
 
     const subject = await Subject.findById(subjectId);
     if (!subject) return res.status(404).json({ message: "Subject not found" });
+    if (subject.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden: Not allowed" });
+    }
 
     let uploadedFile: any = null;
 
@@ -51,6 +74,12 @@ export const createNote = async (req: Request, res: Response) => {
         folder: "leafline/notes",
         resource_type: "auto",
       });
+
+      // The file now lives on Cloudinary — remove the local temp copy multer
+      // left behind, otherwise every upload leaks disk space permanently.
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.warn("Failed to remove temp upload file:", err);
+      });
     }
 
     const note = await Note.create({
@@ -58,6 +87,8 @@ export const createNote = async (req: Request, res: Response) => {
       subjectId,
       title,
       description,
+      content: content ?? "",
+      tags: parseTags(req.body.tags),
       fileUrl: uploadedFile?.secure_url || undefined,
       filePublicId: uploadedFile?.public_id || undefined,
       fileSize: uploadedFile?.bytes ?? (req.file ? req.file.size : undefined),
@@ -80,6 +111,60 @@ export const createNote = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ message: "Failed to create note", error: err });
+  }
+};
+
+// Get ALL of the current user's notes across every subject — powers the
+// unified "Study Notes" view (filterable by subject pill, not subject-first).
+export const getAllNotesForUser = async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.id) return res.status(401).json({ message: "Unauthorized" });
+
+    const {
+      search,
+      subjectId,
+      tag,
+      sortBy = "createdAt",
+      order = "desc",
+      page = "1",
+      limit = "12",
+    } = req.query;
+
+    const query: any = { userId: req.user.id };
+    if (subjectId && typeof subjectId === "string") query.subjectId = subjectId;
+    if (tag && typeof tag === "string") query.tags = tag;
+    if (search && typeof search === "string") {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const sort: any = {};
+    sort[String(sortBy)] = order === "desc" ? -1 : 1;
+
+    const pageNum = Math.max(1, Number(page));
+    const perPage = Math.max(1, Number(limit));
+
+    const [notes, total] = await Promise.all([
+      Note.find(query)
+        .populate("subjectId", "name code")
+        .sort(sort)
+        .skip((pageNum - 1) * perPage)
+        .limit(perPage),
+      Note.countDocuments(query),
+    ]);
+
+    return res.status(200).json({
+      total,
+      page: pageNum,
+      perPage,
+      totalPages: Math.ceil(total / perPage),
+      notes,
+    });
+  } catch (err) {
+    console.error("Get All Notes Error:", err);
+    return res.status(500).json({ message: "Failed to fetch notes", error: err });
   }
 };
 
@@ -138,7 +223,7 @@ export const getNotesBySubject = async (req: Request, res: Response) => {
 // Get single note (owner only)
 export const getNoteById = async (req: Request, res: Response) => {
   try {
-    const note = await Note.findById(req.params.id);
+    const note = await Note.findById(req.params.id).populate("subjectId", "name code");
     if (!note) return res.status(404).json({ message: "Note not found" });
 
     if (note.userId.toString() !== req.user?.id) {
@@ -180,6 +265,10 @@ export const updateNote = async (req: Request, res: Response) => {
         resource_type: "auto",
       });
 
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.warn("Failed to remove temp upload file:", err);
+      });
+
       note.fileUrl = uploadedFile.secure_url;
       note.filePublicId = uploadedFile.public_id;
       note.fileSize = uploadedFile.bytes ?? req.file.size;
@@ -191,7 +280,9 @@ export const updateNote = async (req: Request, res: Response) => {
     }
 
     note.title = req.body.title || note.title;
-    note.description = req.body.description || note.description;
+    note.description = req.body.description ?? note.description;
+    if (req.body.content !== undefined) note.content = req.body.content;
+    if (req.body.tags !== undefined) note.tags = parseTags(req.body.tags);
 
     await note.save();
 
@@ -201,6 +292,36 @@ export const updateNote = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ message: "Failed to update note", error: err });
+  }
+};
+
+// Lightweight autosave — called frequently (debounced) from the note editor.
+// Deliberately skips multer/Cloudinary entirely: it only ever touches
+// title/content/tags, never the file, so it stays fast under frequent calls.
+export const autosaveNote = async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.id) return res.status(401).json({ message: "Unauthorized" });
+
+    const note = await Note.findById(req.params.id);
+    if (!note) return res.status(404).json({ message: "Note not found" });
+
+    if (note.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden: Not allowed" });
+    }
+
+    if (req.body.title !== undefined) note.title = req.body.title;
+    if (req.body.content !== undefined) note.content = req.body.content;
+    if (req.body.tags !== undefined) note.tags = parseTags(req.body.tags);
+
+    await note.save();
+
+    return res.status(200).json({
+      message: "Saved",
+      note: { _id: note._id, updatedAt: note.updatedAt },
+    });
+  } catch (err) {
+    console.error("Autosave Note Error:", err);
+    return res.status(500).json({ message: "Autosave failed", error: err });
   }
 };
 

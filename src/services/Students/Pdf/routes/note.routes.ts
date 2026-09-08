@@ -1,18 +1,36 @@
-// routes/note.routes.ts
+// src/modules/subjects/routes/Subject.routes.ts
 import express from "express";
-import multer from "multer";
-import { protect } from "../../../../MainAuth/middleware/protect";
-import { createNote, deleteNote, getNoteById, getNotesBySubject, updateNote } from "../controller/note.controller";
+
+import { createSubject, deleteSubject, getAllSubjects, getSubjectById, updateSubject } from "../../subjects/CreateSubjects/controllers/CreateSubject.controller";
 import catchAsync from "../../../../utils/catchAsync";
+import { protect } from "../../../../MainAuth/middleware/protect";
 
 
-const NotesRouter = express.Router();
-const upload = multer({ dest: "uploads/notes/" }); // or Cloudinary later
+const subjectsRouter = express.Router();
 
-NotesRouter.post("/:subjectId", catchAsync(protect), upload.single("file"), catchAsync(createNote));
-NotesRouter.get("/:subjectId", catchAsync(protect), catchAsync(getNotesBySubject));
-NotesRouter.get("/single/:id", catchAsync(protect), catchAsync(getNoteById));
-NotesRouter.put("/:id", catchAsync(protect), upload.single("file"), catchAsync(updateNote));
-NotesRouter.delete("/:id", catchAsync(protect), catchAsync(deleteNote));
+// All routes protected
+subjectsRouter.use(catchAsync(protect));
 
-export default NotesRouter;
+// The /notes sub-router must be mounted BEFORE the generic /:id routes below.
+// Otherwise a request to /subjects/notes matches /subjects/:id first (with
+// id="notes") and the notes router is never reached — this was confirmed by
+// actually running the app: GET /subjects/notes returned "Subject not found"
+// from getSubjectById instead of the notes list.
+// subjectsRouter.use("/notes", NotesRouter); // Commented out because NotesRouter is not defined
+
+// CREATE
+subjectsRouter.post("/add-subjects", catchAsync(createSubject));
+
+// READ
+subjectsRouter.get("/", catchAsync(getAllSubjects)); // get all subjects
+subjectsRouter.get("/:id", catchAsync(getSubjectById)); // get single subject
+
+// UPDATE
+subjectsRouter.put("/:id", catchAsync(updateSubject));
+
+// DELETE
+subjectsRouter.delete("/:id", catchAsync(deleteSubject));
+
+
+
+export default subjectsRouter;

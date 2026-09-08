@@ -5,6 +5,7 @@ import {
   subjectValidation,
 } from "../validations/subject.validations";
 import { createNotification } from "../../../../Notifications/services/notification.service";
+import { Note } from "../../../Pdf/model/note.model";
 
 // Create a new Subject
 export const createSubject = async (req: Request, res: Response) => {
@@ -87,7 +88,7 @@ export const deleteSubject = async (req: Request, res: Response) => {
     if (subject.userId.toString() !== req.user?.id) {
       return res.status(403).json({ message: "Forbidden: Not allowed" });
     }
-
+    await Note.deleteMany({ subjectId: subject._id });
     await subject.deleteOne();
     res.status(200).json({ message: "Subject deleted successfully" });
   } catch (err) {

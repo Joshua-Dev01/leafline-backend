@@ -7,6 +7,8 @@ export interface INote extends Document {
   title: string;
   icon: string;
   description?: string;
+  content?: string; // rich-text HTML body from the note editor
+  tags?: string[];
   fileUrl?: string; // PDF or image
   filePublicId?: string;
   fileSize?: number; // bytes
@@ -22,6 +24,8 @@ const noteSchema = new Schema<INote>(
     subjectId: { type: Schema.Types.ObjectId, ref: "Subject", required: true },
     title: { type: String, required: true },
     description: { type: String },
+    content: { type: String, default: "" },
+    tags: { type: [String], default: [] },
     icon: { type: String },
     fileUrl: { type: String },
     filePublicId: { type: String },
