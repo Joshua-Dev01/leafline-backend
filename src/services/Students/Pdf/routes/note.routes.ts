@@ -1,36 +1,36 @@
-// src/modules/subjects/routes/Subject.routes.ts
+// routes/note.routes.ts
 import express from "express";
-
-import { createSubject, deleteSubject, getAllSubjects, getSubjectById, updateSubject } from "../../subjects/CreateSubjects/controllers/CreateSubject.controller";
+import fs from "fs";
+import path from "path";
+import multer from "multer";
+import {
+  autosaveNote,
+  createNote,
+  deleteNote,
+  getAllNotesForUser,
+  getNoteById,
+  getNotesBySubject,
+  updateNote,
+} from "../controller/note.controller";
 import catchAsync from "../../../../utils/catchAsync";
-import { protect } from "../../../../MainAuth/middleware/protect";
 
+const NotesRouter = express.Router();
 
-const subjectsRouter = express.Router();
+const uploadDir = path.join(process.cwd(), "uploads", "notes");
+// Multer will not create this directory itself — without this, the very
+// first file upload on a fresh clone/deploy fails with ENOENT.
+fs.mkdirSync(uploadDir, { recursive: true });
 
-// All routes protected
-subjectsRouter.use(catchAsync(protect));
+const upload = multer({ dest: uploadDir }); // or Cloudinary later
 
-// The /notes sub-router must be mounted BEFORE the generic /:id routes below.
-// Otherwise a request to /subjects/notes matches /subjects/:id first (with
-// id="notes") and the notes router is never reached — this was confirmed by
-// actually running the app: GET /subjects/notes returned "Subject not found"
-// from getSubjectById instead of the notes list.
-// subjectsRouter.use("/notes", NotesRouter); // Commented out because NotesRouter is not defined
+// protect() is already applied once for this whole router at the parent
+// (subjectsRouter.use(catchAsync(protect))), so it isn't repeated per-route here.
+NotesRouter.get("/", catchAsync(getAllNotesForUser));
+NotesRouter.post("/:subjectId", upload.single("file"), catchAsync(createNote));
+NotesRouter.get("/:subjectId", catchAsync(getNotesBySubject));
+NotesRouter.get("/single/:id", catchAsync(getNoteById));
+NotesRouter.patch("/autosave/:id", catchAsync(autosaveNote));
+NotesRouter.put("/:id", upload.single("file"), catchAsync(updateNote));
+NotesRouter.delete("/:id", catchAsync(deleteNote));
 
-// CREATE
-subjectsRouter.post("/add-subjects", catchAsync(createSubject));
-
-// READ
-subjectsRouter.get("/", catchAsync(getAllSubjects)); // get all subjects
-subjectsRouter.get("/:id", catchAsync(getSubjectById)); // get single subject
-
-// UPDATE
-subjectsRouter.put("/:id", catchAsync(updateSubject));
-
-// DELETE
-subjectsRouter.delete("/:id", catchAsync(deleteSubject));
-
-
-
-export default subjectsRouter;
+export default NotesRouter;

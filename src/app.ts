@@ -12,6 +12,7 @@ import EventRouter from "./services/Events/routes/event.route";
 import Analyticsrouter from "./services/analytics/routes/analytics.routes";
 import projectRouter from "./services/project/routes/projects.routes";
 import { scheduleEventReminders } from "./services/Events/controller/eventReminder.cron";
+import libraryRouter from "./services/Library/routes/library.routes";
 
 
 
@@ -58,5 +59,6 @@ app.use("/api/v1/upload", PicturesRouter);
 app.use("/api/v1/events", EventRouter);
 app.use("/api/v1/analytics", Analyticsrouter);
 app.use("/api/v1/project", projectRouter);
+app.use("/api/v1/library", libraryRouter);
 
 export default app;
