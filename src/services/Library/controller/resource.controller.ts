@@ -405,7 +405,7 @@ export const createResource = async (req: Request, res: Response) => {
   });
 
   // Let the AI review it in the background so the upload response isn't delayed.
-  // Anything it can't read or isn't sure about stays pending for an admin.
+  // Anything it can't read or isn't sure about stays pending for an admins.
   if (!autoApprove && env.LIBRARY_AI_REVIEW) {
     void reviewResourceWithAi(String(resource._id));
   }
