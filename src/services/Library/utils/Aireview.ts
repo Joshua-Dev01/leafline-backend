@@ -114,6 +114,10 @@ export const reviewResourceWithAi = async (resourceId: string): Promise<ReviewOu
       if (!updated) return "skipped";
       await createNotification({
         userId: uploaderId,
+        type: "library",
+        actionUrl: "/dashboard/library",
+        actionLabel: "Open library",
+        meta: { resourceId: String(resource._id) },
         title: "Resource approved",
         message: `"${resource.title}" is now live in the Library.`,
       });
@@ -129,6 +133,9 @@ export const reviewResourceWithAi = async (resourceId: string): Promise<ReviewOu
     if (!updated) return "skipped";
     await createNotification({
       userId: uploaderId,
+      type: "library",
+      priority: "high",
+      meta: { resourceId: String(resource._id) },
       title: "Resource not approved",
       message: `"${resource.title}" wasn't approved: ${reason}`,
     });

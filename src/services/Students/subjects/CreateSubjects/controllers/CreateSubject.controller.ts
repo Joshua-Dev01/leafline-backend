@@ -24,10 +24,14 @@ export const createSubject = async (req: Request, res: Response) => {
     // Create a notification for the new subject
     await createNotification({
       userId: req.user.id,
+      type: "note",
+      priority: "low",
+      actionUrl: `/dashboard/notes/viewNotes/${subject._id}`,
+      actionLabel: "View notes",
+      meta: { subjectId: String(subject._id) },
       title: "New Subject Created",
       message: `You added a new subject: ${req.body.name}`,
     });
-    console.log("Notification created ");
 
     res.status(201).json(subject);
   } catch (err) {

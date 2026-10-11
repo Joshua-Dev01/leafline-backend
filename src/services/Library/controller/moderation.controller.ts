@@ -92,6 +92,10 @@ export const approveResource = async (req: Request, res: Response) => {
   if (!wasFlagged) {
     await createNotification({
       userId: resource.uploaderId.toString(),
+      type: "library",
+      actionUrl: "/dashboard/library",
+      actionLabel: "Open library",
+      meta: { resourceId: String(resource._id) },
       title: "Resource approved",
       message: `"${resource.title}" is now live in the Library.`,
     });
@@ -113,6 +117,9 @@ export const rejectResource = async (req: Request, res: Response) => {
 
   await createNotification({
     userId: resource.uploaderId.toString(),
+    type: "library",
+    priority: "high",
+    meta: { resourceId: String(resource._id) },
     title: "Resource not approved",
     message: `"${resource.title}" wasn't approved: ${req.body.reason}`,
   });
@@ -205,6 +212,9 @@ export const resolveReport = async (req: Request, res: Response) => {
 
     await createNotification({
       userId: resource.uploaderId.toString(),
+      type: "library",
+      priority: "high",
+      meta: { resourceId: String(resource._id) },
       title: "Resource removed",
       message: `"${resource.title}" was removed from the Library: ${reason}`,
     });

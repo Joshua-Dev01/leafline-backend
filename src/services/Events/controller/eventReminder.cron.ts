@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { Notification } from "../../Notifications/models/notification.model";
+import { createManyNotifications } from "../../Notifications/services/notification.service";
 import { Event } from "../model/events.model";
 
 /**
@@ -26,15 +26,16 @@ export const scheduleEventReminders = () => {
         ]);
 
         if (receiverSet.size > 0) {
-          await Notification.insertMany(
-            [...receiverSet].map((userId) => ({
-              userId,
-              title:   "Event Reminder 🔔",
-              message: `"${event.title}" starts in less than 24 hours!`,
-              type:    "event",
-              meta:    { eventId: event._id },
-            }))
-          );
+          await createManyNotifications({
+            userIds:     [...receiverSet],
+            type:        "event",
+            priority:    "high",
+            title:       "Event reminder",
+            message:     `"${event.title}" starts in less than 24 hours!`,
+            actionUrl:   "/dashboard/events",
+            actionLabel: "View events",
+            meta:        { eventId: String(event._id) },
+          });
         }
 
         event.reminderSent = true;

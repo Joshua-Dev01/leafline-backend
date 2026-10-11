@@ -398,6 +398,10 @@ export const createResource = async (req: Request, res: Response) => {
 
   await createNotification({
     userId: req.user!.id,
+    type: "library",
+    actionUrl: "/dashboard/library",
+    actionLabel: "Open library",
+    meta: { resourceId: String(resource._id) },
     title: autoApprove ? "Resource published" : "Resource submitted for review",
     message: autoApprove
       ? `"${resource.title}" is now live in the Library.`

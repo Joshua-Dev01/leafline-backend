@@ -101,6 +101,11 @@ export const createNote = async (req: Request, res: Response) => {
 
     await createNotification({
       userId: req.user.id,
+      type: "note",
+      priority: "low",
+      actionUrl: `/dashboard/notes/note/${note._id}`,
+      actionLabel: "Open note",
+      meta: { noteId: String(note._id) },
       title: "New Note Added",
       message: `You uploaded a new note: ${title}`,
     });
