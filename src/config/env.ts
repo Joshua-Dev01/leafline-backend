@@ -25,6 +25,15 @@ export const env = {
 
   OPENAI_API_KEY: process.env.OPENAI_API_KEY as string,
   RESEND_API_KEY: process.env.RESEND_API_KEY as string,
+
+  // Optional: point the Library AI at another OpenAI-compatible provider
+  // (e.g. Groq). When LIBRARY_AI_API_KEY is empty, OpenAI is used as before.
+  LIBRARY_AI_API_KEY: process.env.LIBRARY_AI_API_KEY || "",
+  LIBRARY_AI_BASE_URL: process.env.LIBRARY_AI_BASE_URL || "",
+  LIBRARY_AI_MODEL: process.env.LIBRARY_AI_MODEL || "",
+  LIBRARY_AI_MAX_CHARS: Number(process.env.LIBRARY_AI_MAX_CHARS) || 0,
+  // Let the AI approve/reject new Library uploads. Set LIBRARY_AI_REVIEW=false to turn off.
+  LIBRARY_AI_REVIEW: process.env.LIBRARY_AI_REVIEW !== "false",
 };
 
 // ✅ Fail fast for required envs

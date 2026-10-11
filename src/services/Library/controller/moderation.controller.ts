@@ -3,6 +3,7 @@ import { LibraryResource, RESOURCE_STATUSES } from "../models/resource.model";
 import { LibraryReport } from "../models/report.model";
 import { createNotification } from "../../Notifications/services/notification.service";
 import { escapeRegex } from "../utils/library.utils";
+import { countAiReviewable, reviewPendingWithAi } from "../utils/aiReview";
 
 const HIDDEN_FIELDS = "-fileUrl -filePublicId -extractedText";
 
@@ -210,4 +211,25 @@ export const resolveReport = async (req: Request, res: Response) => {
   }
 
   return res.status(200).json({ message: "Resource removed and reports resolved" });
+};
+// POST /library/admin/ai-review — have the AI work through the pending queue.
+// Responds straight away; the review continues in the background.
+export const runAiReview = async (_req: Request, res: Response) => {
+  const queued = await countAiReviewable();
+  if (queued === 0)
+    return res.status(200).json({
+      queued: 0,
+      message:
+        "Nothing for the AI to review — pending files without readable text need an admin.",
+    });
+
+  void reviewPendingWithAi(25).then((r) =>
+    console.log(
+      `[Library] AI review finished: ${r.approved} approved, ${r.rejected} rejected, ${r.skipped} left for admins`
+    )
+  );
+  return res.status(202).json({
+    queued: Math.min(queued, 25),
+    message: `AI review started for ${Math.min(queued, 25)} resource${queued === 1 ? "" : "s"}. Results appear in a minute or two.`,
+  });
 };

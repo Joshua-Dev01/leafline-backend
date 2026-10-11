@@ -39,6 +39,7 @@ import {
   rejectResource,
   listReports,
   resolveReport,
+  runAiReview,
 } from "../controller/moderation.controller";
 
 const libraryRouter = express.Router();
@@ -115,6 +116,7 @@ libraryRouter.post(
   catchAsync(validate(rejectResourceSchema)),
   catchAsync(rejectResource)
 );
+libraryRouter.post("/admin/ai-review", ...adminOnly, catchAsync(runAiReview));
 libraryRouter.get("/admin/reports", ...adminOnly, catchAsync(listReports));
 libraryRouter.post(
   "/admin/reports/:id/resolve",

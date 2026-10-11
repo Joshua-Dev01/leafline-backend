@@ -44,6 +44,7 @@ export interface ILibraryResource extends Document {
   rejectionReason?: string;
   reviewedBy?: mongoose.Types.ObjectId;
   reviewedAt?: Date;
+  reviewedByAi?: boolean; // true when the AI made the approve/reject decision
 
   viewCount: number;
   downloadCount: number;
@@ -101,6 +102,7 @@ const resourceSchema = new Schema<ILibraryResource>(
     rejectionReason: { type: String },
     reviewedBy: { type: Schema.Types.ObjectId, ref: "LeafLineUser" },
     reviewedAt: { type: Date },
+    reviewedByAi: { type: Boolean, default: false },
 
     viewCount: { type: Number, default: 0 },
     downloadCount: { type: Number, default: 0 },

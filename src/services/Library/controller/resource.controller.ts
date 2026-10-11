@@ -16,6 +16,8 @@ import {
   toDownloadUrl,
   uploadLibraryFile,
 } from "../utils/library.utils";
+import { env } from "../../../config/env";
+import { reviewResourceWithAi } from "../utils/Aireview";
 
 /** Fields never sent to the client. Files are reached via /preview and /download. */
 const HIDDEN_FIELDS = "-fileUrl -filePublicId -extractedText";
@@ -399,8 +401,14 @@ export const createResource = async (req: Request, res: Response) => {
     title: autoApprove ? "Resource published" : "Resource submitted for review",
     message: autoApprove
       ? `"${resource.title}" is now live in the Library.`
-      : `"${resource.title}" will appear in the Library once an admin approves it.`,
+      : `"${resource.title}" will appear in the Library once it has been reviewed.`,
   });
+
+  // Let the AI review it in the background so the upload response isn't delayed.
+  // Anything it can't read or isn't sure about stays pending for an admin.
+  if (!autoApprove && env.LIBRARY_AI_REVIEW) {
+    void reviewResourceWithAi(String(resource._id));
+  }
 
   const safe = resource.toObject();
   delete (safe as any).extractedText;

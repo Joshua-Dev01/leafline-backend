@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
-import { openai } from "../../../config/openai";
+import {
+  aiFailureMessage,
+  LIBRARY_AI_MAX_CHARS,
+  LIBRARY_AI_MODEL,
+  libraryAi,
+} from "../../../config/libraryAi";
 import { LibraryResource } from "../models/resource.model";
 import { canViewResource } from "./resource.controller";
 
-const MODEL = "gpt-4o-mini";
 
 /** Loads a visible resource plus its extracted text, or sends the error response. */
 const loadResourceText = async (req: Request, res: Response) => {
@@ -21,7 +25,7 @@ const loadResourceText = async (req: Request, res: Response) => {
     });
     return null;
   }
-  return { resource, text: resource.extractedText };
+  return { resource, text: resource.extractedText.slice(0, LIBRARY_AI_MAX_CHARS) };
 };
 
 const describe = (r: { title: string; courseCode?: string; subject?: string }) =>
@@ -34,8 +38,8 @@ export const askAboutResource = async (req: Request, res: Response) => {
   const { resource, text } = loaded;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: MODEL,
+    const completion = await libraryAi.chat.completions.create({
+      model: LIBRARY_AI_MODEL,
       temperature: 0.2,
       messages: [
         {
@@ -55,9 +59,12 @@ export const askAboutResource = async (req: Request, res: Response) => {
     return res.status(200).json({ answer });
   } catch (err) {
     console.error("[Library] AI ask failed:", err);
-    return res
-      .status(503)
-      .json({ message: "The AI assistant is unavailable right now. Try again shortly." });
+    return res.status(503).json({
+      message: aiFailureMessage(
+        err,
+        "The AI assistant is unavailable right now. Try again shortly."
+      ),
+    });
   }
 };
 
@@ -87,8 +94,8 @@ export const generateResourceQuiz = async (req: Request, res: Response) => {
   const count = Number(req.body.count) || 5;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: MODEL,
+    const completion = await libraryAi.chat.completions.create({
+      model: LIBRARY_AI_MODEL,
       temperature: 0.4,
       response_format: { type: "json_object" },
       messages: [
@@ -116,8 +123,8 @@ export const generateResourceQuiz = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error("[Library] AI quiz failed:", err);
-    return res
-      .status(503)
-      .json({ message: "Couldn't generate a quiz right now. Try again shortly." });
+    return res.status(503).json({
+      message: aiFailureMessage(err, "Couldn't generate a quiz right now. Try again shortly."),
+    });
   }
 };
