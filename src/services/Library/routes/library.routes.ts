@@ -1,4 +1,5 @@
 import express from "express";
+import { attachPictures } from "../../../MainAuth/pictures/attachPictures";
 import mongoose from "mongoose";
 import catchAsync from "../../../utils/catchAsync";
 import { protect } from "../../../MainAuth/middleware/protect";
@@ -43,6 +44,9 @@ import {
 } from "../controller/moderation.controller";
 
 const libraryRouter = express.Router();
+
+// Turn each uploader's picture id into their real profile-picture URL.
+libraryRouter.use(attachPictures);
 
 // Everything in the Library requires a signed-in, verified user.
 libraryRouter.use(catchAsync(protect));
