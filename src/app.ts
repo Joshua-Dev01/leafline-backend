@@ -13,6 +13,7 @@ import Analyticsrouter from "./services/analytics/routes/analytics.routes";
 import projectRouter from "./services/project/routes/projects.routes";
 import { scheduleEventReminders } from "./services/Events/controller/eventReminder.cron";
 import libraryRouter from "./services/Library/routes/library.routes";
+import { errorHandler } from "./middleware/errorHandler";
 
 
 
@@ -35,7 +36,7 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -60,5 +61,8 @@ app.use("/api/v1/events", EventRouter);
 app.use("/api/v1/analytics", Analyticsrouter);
 app.use("/api/v1/project", projectRouter);
 app.use("/api/v1/library", libraryRouter);
+
+// Must stay LAST: turns thrown errors into JSON responses
+app.use(errorHandler);
 
 export default app;
